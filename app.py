@@ -58,6 +58,12 @@ with st.expander(  "# Click here to know about author of this site!"):
 
 visitor_name=st.text_input("Enter your name:"," ")
 st.write("Thank you",visitor_name,", for visiting my website.")
+
+st.header("!!!Instructions!!!")
+st.write("Please select the default 'Stroke' dataset. This app works for all kind of dataesets but you will get most options when you select 'Stroke' dataset. Other options are"
+         "included for future developement!!! ")
+
+
 st.markdown("Here you can find datasets related to serious diseases.")
 st.write("There are 3 datsets-")
 st.markdown("*")
@@ -109,6 +115,30 @@ if button=='Yes':
 elif button=='No':
     df = df1
 st.write(df.head(12))
+
+if stroke_read_status:
+    with st.expander("# Click here to learn about ' Brain Stroke' dataset. "):
+        strokepic = Image.open('strokepic.jpg')
+        st.image(strokepic, caption='Brain-Stroke')
+        st.write("Finding significant insights and patterns within"
+                 " the variables of this 'Brain Stroke' dataset is the main objective of "
+                 "data visualization in the context of exploratory data "
+                 "analysis (EDA). We want to learn more about the potential "
+                 "connections between the prevalence of strokes and various "
+                 "variables like age, gender, particular health conditions, lifestyle"
+                 " preferences, and occupation. Our goal is to lay the groundwork "
+                 "for deeper analyses and the creation of predictive models, ultimately "
+                 "facilitating a more thorough assessment of stroke risk. We do this by "
+                 "using visual representations that highlight distributions, associations, and correlations.")
+
+
+
+
+
+
+
+
+
 col1,col2,col3=st.columns([2,1,2])
 button1=col1.button("Show Statistics")
 if button1:
@@ -129,8 +159,9 @@ if col3.button("Hide Statistics"):
 cols=df.columns
 numcols= df.select_dtypes(include=[np.number]).columns
 strcols=df.select_dtypes(include=['object']).columns
-
-
+numcoldf=df[numcols]
+strcoldf=df[strcols]
+####start
 
 col1,col2,col3=st.columns([2,1,2])
 button2=col1.button("Show Columns")
@@ -152,30 +183,86 @@ htmlcomp=exp.to_html()
 st.components.v1.html(htmlcomp,width=1000, height=700, scrolling=True)
 
 
-st.write("Please select following variables for different plotting")
-xv=st.selectbox('Please select x or first variable:',cols)
-yv=st.selectbox('Please select y or second variiable:',cols)
-zv=st.selectbox('Please select hue or third variiable:',cols)
+#st.write("Please select following variables for  plotting")
+#xv=st.selectbox('Please select x or first variable:',numcols)
+#yv=st.selectbox('Please select y or second variiable:',numcols)
+#zv=st.selectbox('Please select hue or third variiable:',strcols)
 
-button3=st.button("Bar Chart");
-if button3:
+
+st.header("Different kinds of plots")
+
+graph_button=st.selectbox('Please select one kind of graph from the following options:',['Bar Plot','HeatMap','Violin Plot','Box Plot','2-D Scatter Plot','3-D Scatter Plot'])
+
+
+
+if graph_button=='Bar Plot':
+    st.write("Please select following variables for bar plot")
+    xv = st.selectbox('Please select x or first variable for bar plot:', cols)
+    yv = st.selectbox('Please select y or second variiable for bar plot:', cols)
     st.bar_chart(data=df, x=xv, y=yv)
+    st.pyplot(plt.gcf())
 
-if st.button("Hide Bar Chart"):
-    button3=False
 
-button4=st.button("Heat Map");
-if button4:
-    heatmap_fig = px.density_heatmap(df, x=xv, y=yv, marginal_x="histogram", marginal_y="histogram")
-    st.plotly_chart(heatmap_fig, theme=None)
 
-if st.button("Hide Heat Map"):
-    button4=False
+elif graph_button=='HeatMap':
+    sns.heatmap(numcoldf.corr(), annot=True)
+    st.pyplot(plt.gcf())
 
 
 
 
-st.write("Please select reduced number of columns for Reduced Dataset (Select at least 3 variables (at least 2  of numerical type"
+
+elif graph_button=='Violin Plot':
+    st.write("Please select following variables for violin plot")
+    xv = st.selectbox('Please select x or first variable for violin plot:', strcols)
+    yv = st.selectbox('Please select y or second variiable for violin plot:', numcols)
+    zv = st.selectbox('Please select hue or third variiable for violin plot:', strcols)
+    sns.violinplot(data=df, x=xv, y=yv, hue=zv)
+    st.pyplot(plt.gcf())
+
+
+
+
+elif graph_button=='Box Plot':
+    st.write("Please select following variables for  plot")
+    xv = st.selectbox('Please select x or first variable for  plot:', strcols)
+    yv = st.selectbox('Please select y or second variiable for  plot:', numcols)
+    zv = st.selectbox('Please select hue or third variiable for   plot:', strcols)
+    sns.boxplot(x=xv, y=yv,hue=zv,  data=df)
+    st.pyplot(plt.gcf())
+
+elif graph_button=='2-D Scatter Plot':
+    st.write("Please select following variables for  plot")
+    xv = st.selectbox('Please select x or first variable for  plot:', numcols)
+    yv = st.selectbox('Please select y or second variiable for  plot:', numcols)
+
+    sns.boxplot(x=xv, y=yv,hue=zv,  data=df)
+    sns.scatterplot(data=df, x=xv, y=yv)
+    st.pyplot(plt.gcf())
+elif graph_button=='3-D Scatter Plot':
+    st.write("Please select following variables for  plot")
+    xv = st.selectbox('Please select x or first variable for plot:', numcols)
+    yv = st.selectbox('Please select y or second variiable for plot:', numcols)
+    zv= st.selectbox('Please select z or hue or third variiable for  plot:', numcols)
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+
+
+    ax.set_xlabel(xv)
+    ax.set_ylabel(yv)
+    ax.set_zlabel(zv)
+
+    ax.scatter(x, y, z)
+
+    plt.show()
+
+    st.pyplot(fig)
+
+
+
+### finish
+st.header("Please select reduced number of columns for Reduced Dataset (Select at least 3 variables (at least 2  of numerical type"
          " and at least one  of string or non-numerical type))")
 red_cols=st.multiselect('Pick the columns', cols)
 
@@ -239,12 +326,16 @@ if len(red_cols)>0:
 
 
 
-        rrxv = red_df[rrxv1].values.reshape(-1, 1)
-        rryv = red_df[rryv1].values.reshape(-1, 1)
+        rrxv = red_df[rrxv1]
+        rryv = red_df[rryv1]
 
-        regressor = linear_model.LinearRegression()
-        regressor.fit(rrxv, rryv)
-        y_pred = regressor.predict(rrxv)
+        regressor = LinearRegression()
+        regressor.fit(rrxv.values.reshape(-1, 1), rryv)
+        interce = regressor.intercept_
+        coeff = regressor.coef_
+
+
+        y_pred = rrxv*coeff+interce
 
         fig, ax = plt.subplots()
         ax.scatter(rrxv, rryv, color='red')
@@ -263,11 +354,11 @@ if len(red_cols)>0:
 
 
         if buttonreg=="Yes":
-            rinp = st.number_input(f"Insert value to predict your {rryv1}", value=None, placeholder=f"Type your {rrxv1}...")
+            rinp = st.number_input(f"Insert value to predict your {rryv1}", value=0)
             if rinp != None:
-                rpredict = regressor.predict(np.array([rinp]).reshape(-1, 1))
-                vall=float(rpredict[0])
-                st.write(f"Your {rryv1} is {round(vall,3)} for {rrxv1} value of {rinp}")
+                rpredict = rinp*coeff+interce
+
+                st.write(f"Your {rryv1} is {round(rpredict[0],3)} for {rrxv1} value of {rinp}")
 
 
 if stroke_read_status:
@@ -380,7 +471,7 @@ if stroke_read_status:
 
     for i in range(numofcols-1):
 
-        dummy.append( st.number_input(f"Insert the value of your {colnames[i]}", value=None, placeholder=f"Type your {colnames[i]}.........") )
+        dummy.append( st.number_input(f"Insert the value of your {colnames[i]}", value=0 ) )
 
         #dict.update({ f'k{i}' ,    dummy[i]      })
 
@@ -394,6 +485,9 @@ if stroke_read_status:
 
         if dummy[i] is None:
             dummy[i]=0
+
+    for i in range(numofcols - 1):
+        st.write(f"You selected value: {dummy[i]} for the property '{colnames[i]}' ")
 
     y_predicted = 0
 
@@ -415,11 +509,91 @@ if stroke_read_status:
 
     st.write(f"Your chance of getting stroke is {round(y_predicted, 3)} %.")
 
+    st.header("My own analysis for Stroke dataset")
 
 
 
 
+    st.subheader("Relationship-Plot")
+    sns.relplot(data=df, x="age", y="avg_glucose_level", hue="smoking_status", style="stroke", sizes=(400, 400),alpha=1, palette="muted",height=6)
+    st.pyplot(plt.gcf())
+
+    sns.relplot(data=df, x="age", y="bmi", hue="smoking_status", style="stroke", sizes=(400, 400), alpha=1,palette="muted",height=6)
+    st.pyplot(plt.gcf())
+
+    st.subheader("Data-Distribution-Plot")
+    sns.displot(df, x="stroke", col="smoking_status", row="heart_disease",binwidth=0.2, height=3, facet_kws={'margin_titles':True, 'sharex':False, 'sharey':False}   )
+    st.pyplot(plt.gcf())
+
+    st.subheader("Linear Regression Plot")
+    sns.lmplot(data=df, x="age", y="avg_glucose_level",col="stroke", row="heart_disease", height=3, facet_kws={'margin_titles':True, 'sharex':False, 'sharey':False} )
+    st.pyplot(plt.gcf())
+
+    sns.lmplot(data=df, x="age", y="bmi", col="stroke", row="heart_disease", height=3,
+               facet_kws={'margin_titles': True, 'sharex': False, 'sharey': False})
+    st.pyplot(plt.gcf())
+
+    sns.lmplot(data=df, x="bmi", y="avg_glucose_level", col="stroke", row="heart_disease", height=3,
+               facet_kws={'margin_titles': True, 'sharex': False, 'sharey': False})
+    st.pyplot(plt.gcf())
+
+    st.subheader("Logistics Regression Plot")
+    pal = {"Male":"#6495ED", "Female":"#F08080"}
 
 
 
+    plt.figure(figsize=(5, 5))
+    aaaa=sns.lmplot(x="age", y="stroke", row="smoking_status", hue="gender", data=df,palette=pal, y_jitter=.02, logistic=True, truncate=False)
+    aaaa.set(xlim=(0, 100), ylim=(-.05, 1.05))
 
+    st.pyplot(plt.gcf())
+
+    st.subheader("Summarize")
+    st.write("From above plots we can notice:")
+    smoke = 100 * len(df.loc[(df["smoking_status"] == 'smokes') & (df["stroke"] == 1)]) / len(
+        df.loc[df["smoking_status"] == 'smokes'])
+    str = 'smoke'
+    st.write(
+        f"Percentage of person who {str} and having stroke compared to total number of person who {str} is {round(smoke, 3)} % ")
+
+    formerlysmoke = 100 * len(df.loc[(df["smoking_status"] == 'formerly smoked') & (df["stroke"] == 1)]) / len(
+        df.loc[df["smoking_status"] == 'formerly smoked'])
+    str = 'formerly smoke'
+    st.write(
+        f"Percentage of person who {str} and having stroke compared to total number of person who {str} is {round(formerlysmoke, 3)} % ")
+
+    neversmoke = 100 * len(df.loc[(df["smoking_status"] == 'never smoked') & (df["stroke"] == 1)]) / len(
+        df.loc[df["smoking_status"] == 'never smoked'])
+    str = 'never smoke'
+    st.write(
+        f"Percentage of person who {str} and having stroke compared to total number of person who {str} is {round(neversmoke, 3)} % ")
+
+    unknown = 100 * len(df.loc[(df["smoking_status"] == 'Unknown') & (df["stroke"] == 1)]) / len(
+        df.loc[df["smoking_status"] == 'Unknown'])
+    str = 'smoking condition is unknown'
+    st.write(
+        f"Percentage of person whose {str} and having stroke compared to total number of person whose {str} is {round(unknown, 3)} % ")
+
+    smoke2 = 100 * len(df.loc[(df["smoking_status"] == 'smokes') & (df["heart_disease"] == 1)]) / len(
+        df.loc[df["smoking_status"] == 'smokes'])
+    str = 'smoke'
+    st.write(
+        f"Percentage of person who {str} and having heart disease compared to total number of person who {str} is {round(smoke2, 3)} % ")
+
+    formerlysmoke2 = 100 * len(df.loc[(df["smoking_status"] == 'formerly smoked') & (df["heart_disease"] == 1)]) / len(
+        df.loc[df["smoking_status"] == 'formerly smoked'])
+    str = 'formerly smoke'
+    st.write(
+        f"Percentage of person who {str} and having heart disease compared to total number of person who {str} is {round(formerlysmoke2, 3)} % ")
+
+    neversmoke2 = 100 * len(df.loc[(df["smoking_status"] == 'never smoked') & (df["heart_disease"] == 1)]) / len(
+        df.loc[df["smoking_status"] == 'never smoked'])
+    str = 'never smoke'
+    st.write(
+        f"Percentage of person who {str} and having heart disease compared to total number of person who {str} is {round(neversmoke2, 3)} % ")
+
+    unknown2 = 100 * len(df.loc[(df["smoking_status"] == 'Unknown') & (df["heart_disease"] == 1)]) / len(
+        df.loc[df["smoking_status"] == 'Unknown'])
+    str = 'smoking condition is unknown'
+    st.write(
+        f"Percentage of person whose {str} and having heart disease compared to total number of person whose {str} is {round(unknown2, 3)} % ")
