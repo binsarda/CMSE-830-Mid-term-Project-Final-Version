@@ -6,4 +6,4 @@ streamlit
 plotly
 scikit-learn
 hiplot
-statistics
+statsmodels
