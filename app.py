@@ -60,8 +60,8 @@ visitor_name=st.text_input("Enter your name:"," ")
 st.write("Thank you",visitor_name,", for visiting my website.")
 
 st.header("!!!Instructions!!!")
-st.write("Please select the default 'Stroke' dataset. This app works for all kind of dataesets but you will get most options when you select 'Stroke' dataset. Other options are"
-         "included for future developement!!! ")
+st.subheader("Please select the default 'Stroke' dataset. This app works for all kind of dataesets but you will get most options when you select 'Stroke' dataset. Other options are"
+         "included for future developement!!! And do not click on anything when you see running icon!!!! ")
 
 
 st.markdown("Here you can find datasets related to serious diseases.")
@@ -235,29 +235,29 @@ elif graph_button=='2-D Scatter Plot':
     st.write("Please select following variables for  plot")
     xv = st.selectbox('Please select x or first variable for  plot:', numcols)
     yv = st.selectbox('Please select y or second variiable for  plot:', numcols)
+    zv= st.selectbox('Please select z or hue or third variiable for  plot:', strcols)
 
-    sns.boxplot(x=xv, y=yv,hue=zv,  data=df)
-    sns.scatterplot(data=df, x=xv, y=yv)
+    a=sns.scatterplot(data=df, x=xv, y=yv, hue=zv)
     st.pyplot(plt.gcf())
 elif graph_button=='3-D Scatter Plot':
     st.write("Please select following variables for  plot")
     xv = st.selectbox('Please select x or first variable for plot:', numcols)
     yv = st.selectbox('Please select y or second variiable for plot:', numcols)
     zv= st.selectbox('Please select z or hue or third variiable for  plot:', numcols)
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+    fig3d = plt.figure(figsize=(15,15))
+    ax3d = fig3d.add_subplot( projection='3d')
 
 
 
-    ax.set_xlabel(xv)
-    ax.set_ylabel(yv)
-    ax.set_zlabel(zv)
+    ax3d.set_xlabel(xv)
+    ax3d.set_ylabel(yv)
+    ax3d.set_zlabel(zv)
 
-    ax.scatter(x, y, z)
+    ax3d.scatter(df[xv],df[yv], df[zv])
 
-    plt.show()
 
-    st.pyplot(fig)
+
+    st.pyplot(fig3d)
 
 
 
@@ -276,6 +276,8 @@ if len(red_cols)>0:
     st.write(red_df.head(10))
     red_numcols = red_df.select_dtypes(include=[np.number]).columns
     red_strcols = red_df.select_dtypes(include=['object']).columns
+    red_ndf=df[red_numcols]
+    red_sdf=df[red_strcols]
     st.sidebar.write("For reduced dataset")
     st.sidebar.write("No. of columns are ", len(red_cols))
     st.sidebar.write("The columns are following-")
@@ -284,38 +286,32 @@ if len(red_cols)>0:
     st.sidebar.write(red_numcols)
     st.sidebar.write("Name of columns containing string or non-numerical values: ")
     st.sidebar.write(red_strcols)
+    if len(red_numcols) == 1:
+        st.write("Please select following variables for different plotting (for reduced dataset)")
+        rxv = st.selectbox('(For reduced dataset) Please select x or first variable:', red_numcols)
 
 
+    if len(red_numcols) >= 2:
+        st.write("Please select following variables for different plotting (for reduced dataset)")
+        rxv = st.selectbox('(For reduced dataset) Please select x or first variable:', red_numcols)
+        ryv = st.selectbox('(For reduced dataset) Please select y or second variiable:', red_numcols)
+        if len(red_strcols) >= 1:
+            rzv = st.selectbox('(For reduced dataset) Please select hue or third variiable:', red_strcols)
 
 
-if len(red_cols)==1:
-    st.write("Please select following variables for different plotting (for reduced dataset)")
-    rxv = st.selectbox('(For reduced dataset) Please select x or first variable:', red_cols)
-elif len(red_cols)==2:
-    st.write("Please select following variables for different plotting (for reduced dataset)")
-    rxv = st.selectbox('(For reduced dataset) Please select x or first variable:', red_cols)
-    ryv = st.selectbox('(For reduced dataset) Please select y or second variiable:', red_cols)
-else:
-    st.write("Please select following variables for different plotting (for reduced dataset)")
-    rxv = st.selectbox('(For reduced dataset) Please select x or first variable:', red_cols)
-    ryv = st.selectbox('(For reduced dataset) Please select y or second variiable:', red_cols)
-    rzv = st.selectbox('(For reduced dataset) Please select hue or third variiable:', red_cols)
+        plot1 = plt.figure(figsize=(10, 4))
+        sns.lineplot(x=rxv, y=ryv, data=red_df)
+        st.pyplot(plot1)
 
+        plot2 = sns.pairplot(red_df)
+        st.pyplot(plot2.fig)
 
-if len(red_cols)>=2:
-    plot1 = plt.figure(figsize=(10, 4))
-    sns.lineplot(x=rxv, y=ryv, data=red_df)
-    st.pyplot(plot1)
+        plot3 = sns.heatmap(red_ndf.corr(), annot=True)
+        st.pyplot(plot3.get_figure())
 
-    plot2 = sns.pairplot(red_df)
-    st.pyplot(plot2.fig)
-
-    plot3 = sns.heatmap(red_df.corr(), annot=True)
-    st.pyplot(plot3.get_figure())
-
-    fig4, ax4 = plt.subplots()
-    sns.heatmap(red_df.corr(), ax=ax4,annot=True)
-    st.write(fig4)
+        fig4, ax4 = plt.subplots()
+        sns.heatmap(red_ndf.corr(), ax=ax4, annot=True)
+        st.write(fig4)
 
 if len(red_cols)>0:
     if len(red_numcols) >= 2:
@@ -359,6 +355,7 @@ if len(red_cols)>0:
                 rpredict = rinp*coeff+interce
 
                 st.write(f"Your {rryv1} is {round(rpredict[0],3)} for {rrxv1} value of {rinp}")
+
 
 
 if stroke_read_status:
@@ -537,16 +534,18 @@ if stroke_read_status:
                facet_kws={'margin_titles': True, 'sharex': False, 'sharey': False})
     st.pyplot(plt.gcf())
 
-    st.subheader("Logistics Regression Plot")
-    pal = {"Male":"#6495ED", "Female":"#F08080"}
+    col1, col2, col3 = st.columns([1, 2, 1])
+    buttonlr = col1.button("Show Logistic Regressions")
+    if buttonlr:
+        st.subheader("Logistics Regression Plot")
+        plt.figure(figsize=(5, 5))
+        sns.lmplot(x="age", y="stroke", row="smoking_status", hue="gender", data=df,logistic = True, truncate = True)
+        #aaaa.set(xlim=(0, 100), ylim=(-.05, 1.05))
+        st.pyplot(plt.gcf())
+    if col3.button("Hide Logistic Regressions"):
+        buttonlr = False
 
 
-
-    plt.figure(figsize=(5, 5))
-    aaaa=sns.lmplot(x="age", y="stroke", row="smoking_status", hue="gender", data=df,palette=pal, y_jitter=.02, logistic=True, truncate=False)
-    aaaa.set(xlim=(0, 100), ylim=(-.05, 1.05))
-
-    st.pyplot(plt.gcf())
 
     st.subheader("Summarize")
     st.write("From above plots we can notice:")
