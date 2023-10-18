@@ -60,8 +60,8 @@ visitor_name=st.text_input("Enter your name:"," ")
 st.write("Thank you",visitor_name,", for visiting my website.")
 
 st.header("!!!Instructions!!!")
-st.subheader("Please select the default 'Stroke' dataset. This app works for all kind of dataesets but you will get most options when you select 'Stroke' dataset. Other options are"
-         "included for future developement!!! And do not click on anything when you see running icon!!!! ")
+st.subheader("Please select the default 'Stroke' dataset. This app works for all kind of dataesets but you will get most options when you select 'Stroke' dataset.  Other options are "
+         " included for future developement!!! And do not click on anything when you see running icon!!!! ")
 
 
 st.markdown("Here you can find datasets related to serious diseases.")
