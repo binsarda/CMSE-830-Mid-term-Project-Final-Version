@@ -31,7 +31,7 @@ egr = Image.open('msu.png')
 egr= egr.resize((1000, 1000))
 col3.image(egr, caption='Spartans')
 
-st.sidebar.write("My github link: [link](https://github.com/binsarda/CMSE-830-Mid-term-Project)")
+st.sidebar.write("My github link: [link](https://github.com/binsarda?tab=repositories)")
 cmse= Image.open('cmse.jfif')
 
 st.sidebar.image(cmse, caption='CMSE')
